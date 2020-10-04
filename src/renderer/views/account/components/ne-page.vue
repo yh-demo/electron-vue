@@ -68,7 +68,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit" v-loading="submit_loading">保存</el-button>
-        <el-button type="warning" @click="onPrint">打印</el-button>
+        <el-button type="warning" @click="onPrint" v-if="!is_add">打印</el-button>
       </el-form-item>
     </el-form>
 </el-dialog>
@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import { ipcRenderer } from 'electron'
 export default {
   data() {
     return {
@@ -149,7 +150,15 @@ export default {
       })
     },
     onPrint() {
+      console.log('-onPrint-')
       // 打印
+      // 使用ipcRenderer与主进程通信，并获取返回值
+      ipcRenderer.send('getPrinterList')
+      // 监听主线程获取到打印机列表后的回调
+      ipcRenderer.once('getPrinterList', (event, data) => {
+        // data就是打印机列表
+        console.log(data)
+      })
     },
     handleClose() {
       console.log('handleClose')

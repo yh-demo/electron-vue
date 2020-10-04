@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -18,9 +18,17 @@ function createWindow() {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: 700,
     useContentSize: true,
-    width: 1000
+    width: 1200
+  })
+
+  // 在主线程下，通过ipcMain对象监听渲染线程传过来的getPrinterList事件
+  ipcMain.on('getPrinterList', (event) => {
+    // 在主线程中获取打印机列表
+    const list = mainWindow.webContents.getPrinters()
+    // 通过webContents发送事件到渲染线程，同时将打印机列表也传过去
+    mainWindow.webContents.send('getPrinterList', list)
   })
 
   mainWindow.loadURL(winURL)
@@ -52,12 +60,12 @@ app.on('activate', () => {
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
 
-import { autoUpdater } from 'electron-updater'
+// import { autoUpdater } from 'electron-updater'
 
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
+// autoUpdater.on('update-downloaded', () => {
+//   autoUpdater.quitAndInstall()
+// })
 
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
+// app.on('ready', () => {
+//   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+// })

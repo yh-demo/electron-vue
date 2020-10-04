@@ -36,9 +36,10 @@
       <el-table-column prop="total_money" label="金额"  width="120"/>
       <el-table-column prop="group_date_time" label="安排时间" width="180"/>
       <el-table-column prop="remark" label="备注" min-width="180" show-overflow-tooltip />
-      <el-table-column align="center" prop="created_at" label="操作" width="100">
+      <el-table-column align="center" prop="created_at" label="操作" width="150">
         <template slot-scope="{row}">
            <el-button type="primary" @click="handleCreate(row)" size="mini">查看</el-button>
+           <el-button type="primary" @click="handlePrint(row)" size="mini">打印</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -49,15 +50,20 @@
        ref="ne-page"
        @handleRefresh="onHandleRefresh"
       />
+      <!-- 打印 -->
+      <Print
+       ref="print"
+      />
   </div>
 </template>
 
 <script>
 // import { req } from '@/api/index'
 import NePage from './components/ne-page'
+import Print from './components/print'
 export default {
   components: {
-    NePage
+    NePage, Print
   },
   props: {
     pickerOptions: {
@@ -138,6 +144,10 @@ export default {
     onHandleRefresh() {
       console.log('-onHandleRefresh-')
       this.getList()
+    },
+    // 打印
+    handlePrint(item) {
+      this.$refs['print'].print('http://www.baidu.com?abcdef=' + item.id)
     }
   }
 }
