@@ -20,7 +20,7 @@
   },
   "build": {
     "productName": "qian-print",
-    "appId": "org.simulatedgreg.electron-vue",
+    "appId": "szmr.hb-site.ltd",
     "directories": {
       "output": "build"
     },
