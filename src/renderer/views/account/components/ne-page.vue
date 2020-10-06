@@ -76,10 +76,17 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
+// import { ipcRenderer } from 'electron'
 export default {
+  props: {
+    handlePrint: {
+      type: Function,
+      default: (item) => {}
+    }
+  },
   data() {
     return {
+      payload: {},
       is_add: true,
       submit_loading: false,
       title: '',
@@ -127,6 +134,7 @@ export default {
       })
     },
     showDialog(item) {
+      this.payload = item
       this.dialogVisible = true
       this.is_add = !item.hasOwnProperty('id')
       this.title = this.is_add ? '新增打印单' : '编辑打印单'
@@ -151,14 +159,7 @@ export default {
     },
     onPrint() {
       console.log('-onPrint-')
-      // 打印
-      // 使用ipcRenderer与主进程通信，并获取返回值
-      ipcRenderer.send('getPrinterList')
-      // 监听主线程获取到打印机列表后的回调
-      ipcRenderer.once('getPrinterList', (event, data) => {
-        // data就是打印机列表
-        console.log(data)
-      })
+      this.handlePrint(this.payload)
     },
     handleClose() {
       console.log('handleClose')

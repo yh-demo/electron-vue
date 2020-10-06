@@ -25,6 +25,10 @@
         <el-button type="primary" @click="getList(true)" size="mini">查询</el-button>
       </el-form-item>
   </el-form>
+  <!-- 打印 -->
+      <Print
+       ref="print"
+      />
   </div>
     
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" size="mini" border fit highlight-current-row>
@@ -48,12 +52,10 @@
       <!-- 新增或编辑 -->
       <NePage
        ref="ne-page"
+       :handlePrint="handlePrint"
        @handleRefresh="onHandleRefresh"
       />
-      <!-- 打印 -->
-      <Print
-       ref="print"
-      />
+      
   </div>
 </template>
 
@@ -147,7 +149,8 @@ export default {
     },
     // 打印
     handlePrint(item) {
-      this.$refs['print'].print('http://www.baidu.com?abcdef=' + item.id)
+      console.log(item)
+      // this.$refs['print'].print(item.print_href)
     }
   }
 }
