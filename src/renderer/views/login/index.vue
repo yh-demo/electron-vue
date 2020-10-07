@@ -6,14 +6,14 @@
         <span class="svg-container svg-container_login">
           <svg-icon icon-class="user" />
         </span>
-        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="username" />
+        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="on" placeholder="请输入帐号" />
       </el-form-item>
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password"></svg-icon>
         </span>
         <el-input name="password" :type="pwdType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on"
-          placeholder="password"></el-input>
+          placeholder="请输入密码"></el-input>
           <span class="show-pwd" @click="showPwd"><svg-icon icon-class="eye" /></span>
       </el-form-item>
       <el-form-item>
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-
+import { getToken } from '@/utils/auth'
 export default {
   name: 'login',
   data() {
@@ -47,6 +47,10 @@ export default {
       pwdType: 'password'
     }
   },
+
+  mounted() {
+    console.log('--mounted--', getToken())
+  },
   methods: {
     showPwd() {
       if (this.pwdType === 'password') {
@@ -57,19 +61,29 @@ export default {
     },
     handleLogin() {
       this.loading = true
-      this.$req('/qyjz/adminLogin', {
+      this.$store.dispatch('Login', {
         account: this.loginForm.username,
         password: this.loginForm.password
-      }).then(({ data }) => {
-        console.log('---+++', data)
+      }).then(() => {
         this.loading = false
-        this.$store.commit('SET_TOKEN', data.token)
         this.$router.push({ path: '/' })
-      }).catch(v => {
+      }).catch(() => {
         this.loading = false
-        console.log('---', v)
-        console.log(v)
       })
+      this.loading = true
+      // this.$req('/qyjz/adminLogin', {
+      //   account: this.loginForm.username,
+      //   password: this.loginForm.password
+      // }).then(({ data }) => {
+      //   console.log('---+++', data)
+      //   this.loading = false
+      //   this.$store.commit('SET_TOKEN', data.token)
+      //   this.$router.push({ path: '/' })
+      // }).catch(v => {
+      //   this.loading = false
+      //   console.log('---', v)
+      //   console.log(v)
+      // })
       // this.$refs.loginForm.validate(valid => {
       //   if (valid) {
       //     this.loading = true

@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
      <div class="block">
-       <el-button type="primary" @click="handleCreate({})" size="mini">创建</el-button>
+       <el-button type="primary" @click="handleCreate({})"  >创建</el-button>
    
-    <el-form :inline="true" :model="listQuery" size="mini" style="display:inline">
+    <el-form :inline="true" :model="listQuery"  style="display:inline">
       <el-form-item>
         <el-input v-model="listQuery.keyword" placeholder="品名"></el-input>
       </el-form-item>
     
       <el-form-item>
-        <el-button type="primary" @click="getList(true)" size="mini">查询</el-button>
+        <el-button type="primary" @click="getList(true)"  >查询</el-button>
       </el-form-item>
   </el-form>
   </div>
@@ -18,41 +18,43 @@
     :data="list" 
     v-loading.body="listLoading" 
     @row-dblclick="onRowDblClick"
-    element-loading-text="Loading" size="mini" border fit highlight-current-row>
+    element-loading-text="Loading"   border fit highlight-current-row>
 
       <el-table-column prop="name" label="品名" width="120" show-overflow-tooltip >
         <template slot-scope="{row}">
-          <el-input v-if="row.is_edit" v-model="row.name" placeholder="品名" size="mini"  @change="handleInputChange($event,'name',row)"/>
+          <el-input v-if="row.is_edit" v-model="row.name" placeholder="品名"   @change="handleInputChange($event,'name',row)"/>
           <div v-else>{{row.name}}</div>
         </template>
       </el-table-column>
       <el-table-column prop="pinyin" label="拼音" width="120" show-overflow-tooltip >
         <template slot-scope="{row}">
-          <el-input v-if="row.is_edit" v-model="row.pinyin" placeholder="拼音" size="mini"  @change="handleInputChange($event,'pinyin',row)"/>
+          <el-input v-if="row.is_edit" v-model="row.pinyin" placeholder="拼音"    @change="handleInputChange($event,'pinyin',row)"/>
           <div v-else>{{row.pinyin}}</div>
         </template>
       </el-table-column>
       <el-table-column prop="pinyin" label="库存" width="120" show-overflow-tooltip >
         <template slot-scope="{row}">
-          <el-input v-if="row.is_edit" v-model="row.stock" placeholder="库存" type="number" size="mini"  @change="handleInputChange($event,'stock',row)"/>
+          <el-input v-if="row.is_edit" v-model="row.stock" placeholder="库存" type="number"    @change="handleInputChange($event,'stock',row)"/>
           <div v-else>{{row.stock}}</div>
         </template>
       </el-table-column>
       <el-table-column prop="sp_price" label="供货价" width="120" show-overflow-tooltip >
         <template slot-scope="{row}">
-          <el-input v-if="row.is_edit" v-model="row.sp_price" type="number" placeholder="供货价" size="mini"  @change="handleInputChange($event,'sp_price',row)"/>
+          <el-input v-if="row.is_edit" v-model="row.sp_price" type="number" placeholder="供货价"  @change="handleInputChange($event,'sp_price',row)"/>
           <div v-else>{{row.sp_price}}</div>
         </template>
       </el-table-column>
       <el-table-column prop="price" label="单价" width="120" show-overflow-tooltip >
         <template slot-scope="{row}">
-          <el-input v-if="row.is_edit" v-model="row.price" type="number" placeholder="单价" size="mini" @change="handleInputChange($event,'price',row)"/>
+          <el-input v-if="row.is_edit" v-model="row.price" type="number" placeholder="单价"  @change="handleInputChange($event,'price',row)"/>
           <div v-else>{{row.price}}</div>
         </template>
       </el-table-column>
-      <el-table-column prop="price" label="操作" width="120" show-overflow-tooltip >
+      <el-table-column prop="price" label="操作" width="300" show-overflow-tooltip >
         <template slot-scope="{row,$index}">
-          <el-button type="danger" @click="handleDel(row,$index)" size="mini">删除</el-button>
+          <el-button type="primary" @click="handleCreate(row)" >编辑</el-button>
+          <el-button type="danger" @click="handleDel(row,$index)" >删除</el-button>
+          <el-button type="warning" @click="handleEsChart(row,$index)" >走势图</el-button>
         </template>
       </el-table-column>
       
@@ -64,15 +66,20 @@
        ref="ne-material"
        @handleRefresh="onHandleRefresh"
       />
+      <!-- 新增或编辑 -->
+      <EschartMatrial
+       ref="eschart-material"
+      />
   </div>
 </template>
 
 <script>
 // import { req } from '@/api/index'
+import EschartMatrial from './components/eschart-material'
 import NeMaterial from './components/ne-material'
 export default {
   components: {
-    NeMaterial
+    NeMaterial, EschartMatrial
   },
   props: {
 
@@ -144,6 +151,9 @@ export default {
       this.$req('/qyjz/materialModInfo', obj).catch(() => {
         this.$message({ message: '修改异常,请重新尝试', type: 'success' })
       })
+    },
+    handleEsChart(item, index) {
+      this.$refs['eschart-material'].showDialog(item)
     }
 
   }

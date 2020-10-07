@@ -1,4 +1,5 @@
-import { login, logout, getInfo } from '@/api/login'
+import { logout, getInfo } from '@/api/login'
+import { requestApi } from '@/api/index'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -27,17 +28,28 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
-      return new Promise((resolve, reject) => {
-        login(username, userInfo.password).then(response => {
+      return requestApi('/qyjz/adminLogin', userInfo)
+        .then(response => {
           const data = response.data
+          console.log('------setToken1---------')
           setToken(data.token)
+          console.log('------setToken2---------')
           commit('SET_TOKEN', data.token)
-          resolve()
-        }).catch(error => {
-          reject(error)
         })
-      })
+      // const username = userInfo.username.trim()
+
+      // return new Promise((resolve, reject) => {
+      //   login(username, userInfo.password).then(response => {
+      //     const data = response.data
+      //     console.log('------setToken1---------')
+      //     setToken(data.token)
+      //     console.log('------setToken2---------')
+      //     commit('SET_TOKEN', data.token)
+      //     resolve()
+      //   }).catch(error => {
+      //     reject(error)
+      //   })
+      // })
     },
 
     // 获取用户信息

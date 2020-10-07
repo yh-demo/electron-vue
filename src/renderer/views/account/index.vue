@@ -1,9 +1,10 @@
 <template>
   <div class="app-container">
      <div class="block">
-       <el-button type="primary" @click="handleCreate({})" size="mini">创建</el-button>
+       <el-button type="primary" @click="handleCreate({})">创建</el-button>
+       <el-form :inline="true" :model="listQuery" style="display:inline">
+         <el-form-item>
     <el-date-picker
-      size="mini"
       v-model="listQuery.range_date"
       type="daterange"
       align="left"
@@ -16,22 +17,25 @@
       @change = "onRangeDateChange"
       >
     </el-date-picker>
-    <el-form :inline="true" :model="listQuery" size="mini" style="display:inline">
+    </el-form-item>
       <el-form-item>
         <el-input v-model="listQuery.keyword" placeholder="用户名/手机号"></el-input>
       </el-form-item>
     
       <el-form-item>
-        <el-button type="primary" @click="getList(true)" size="mini">查询</el-button>
+        <el-button type="primary" @click="getList(true)">查询</el-button>
       </el-form-item>
-  </el-form>
-  <!-- 打印 -->
+      <el-form-item>
+        <!-- 打印 -->
       <Print
        ref="print"
       />
+      </el-form-item>
+  </el-form>
+
   </div>
     
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" size="mini" border fit highlight-current-row>
+    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
       <el-table-column   prop="id" label='ID' width="60">
         
       </el-table-column>
@@ -40,10 +44,11 @@
       <el-table-column prop="total_money" label="金额"  width="120"/>
       <el-table-column prop="group_date_time" label="安排时间" width="180"/>
       <el-table-column prop="remark" label="备注" min-width="180" show-overflow-tooltip />
-      <el-table-column align="center" prop="created_at" label="操作" width="150">
-        <template slot-scope="{row}">
-           <el-button type="primary" @click="handleCreate(row)" size="mini">查看</el-button>
-           <el-button type="primary" @click="handlePrint(row)" size="mini">打印</el-button>
+      <el-table-column align="center" prop="created_at" label="操作" min-width="300">
+        <template slot-scope="{row,$index}">
+           <el-button type="primary" @click="handleCreate(row)" >查看</el-button>
+           <el-button type="warning" @click="handlePrint(row)">打印</el-button>
+           <el-button type="danger" @click="handleDel(row,$index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -150,7 +155,16 @@ export default {
     // 打印
     handlePrint(item) {
       console.log(item)
-      // this.$refs['print'].print(item.print_href)
+      this.$refs['print'].print(item.print_href)
+    },
+    handleDel(item, index) {
+      // 删除
+      this.$confirm('确定删除该记录？', '提示', { type: 'error' }).then(v => {
+        this.$req('/qyjz/taskDel', { id: item.id }).then(({ code, msg }) => {
+          this.list.splice(index, 1)
+        })
+      }).catch(() => {
+      })
     }
   }
 }

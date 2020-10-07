@@ -95,6 +95,18 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/customer',
+    component: Layout,
+    children: [
+      {
+        path: 'customer',
+        name: 'customer',
+        component: () => import('@/views/customer/lists'),
+        meta: { title: '客户管理', icon: 'user' }
+      }
+    ]
+  },
 
   { path: '*', redirect: '/404', hidden: true }
 ]

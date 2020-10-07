@@ -56,3 +56,13 @@ export function formatTime(time, option) {
     return d.getMonth() + 1 + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
   }
 }
+
+export function myTimeToLocal(inputTime = Date()) {
+  var localTime = ''
+  inputTime = new Date(inputTime).getTime()
+  const offset = (new Date()).getTimezoneOffset()
+  localTime = (new Date(inputTime - offset * 60000)).toISOString()
+  localTime = localTime.substr(0, localTime.lastIndexOf('.'))
+  localTime = localTime.replace('T', ' ')
+  return localTime
+}

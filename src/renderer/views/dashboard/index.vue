@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">截止今日总任务数 :{{total_task_count}}</div>
+    <div class="dashboard-text">截止今日总单数 :{{total_task_count}}</div>
     <div class="dashboard-text">截止今日累计总额 :{{total_money}}</div>
     <div class="dashboard-text">截止今日累计耗材 :{{sum_total_num}}</div>
     <div id="echarts" style="width:100%;height:400px;margin-top:20px"></div>
@@ -11,7 +11,7 @@
 <script>
 import echarts from 'echarts'
 import { mapGetters } from 'vuex'
-
+import { getToken } from '@/utils/auth'
 export default {
   name: 'dashboard',
   data() {
@@ -41,6 +41,7 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'token',
       'name',
       'roles'
     ])
@@ -66,8 +67,10 @@ export default {
   created() {
     this._initData()
   },
-  mounted() {
 
+  mounted() {
+    console.log('--mounted--index', getToken())
+    console.log('--mounted--token', this.token)
   },
   methods: {
     _initData() {

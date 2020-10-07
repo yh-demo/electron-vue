@@ -5,23 +5,19 @@
   @close="handleClose"
   top="1vh" width="75%"
    >
-    <el-form ref="form" :model="temp" label-width="120px" >
-      <el-form-item prop="name" label="品名">
+    <el-form ref="form" :model="temp" label-width="120px" size="mini">
+      <el-form-item prop="name" label="用户名">
         <el-input v-model="temp.name" />
       </el-form-item> 
       <el-form-item prop="pinyin" label="拼音">
         <el-input v-model="temp.pinyin" />
       </el-form-item>
-      <el-form-item prop="stock" label="库存">
-        <el-input v-model="temp.stock" type="number" />
+      <el-form-item prop="tel" label="电话">
+        <el-input v-model="temp.tel"  />
       </el-form-item>
-      <el-form-item prop="sp_price" label="进货价">
-        <el-input v-model="temp.sp_price" type="number" />
+      <el-form-item prop="remark" label="备注">
+        <el-input v-model="temp.remark" type="textarea"/>
       </el-form-item>
-      <el-form-item prop="price" label="单价">
-        <el-input v-model="temp.price" type="number"/>
-      </el-form-item>
-      
       <el-form-item>
         <el-button type="primary" @click="onSubmit" v-loading="submit_loading">保存</el-button>
       </el-form-item>
@@ -44,9 +40,8 @@ export default {
         id: undefined,
         name: undefined,
         pinyin: undefined,
-        stock: undefined,
-        sp_price: undefined,
-        price: undefined
+        tel: undefined,
+        remark: undefined
 
       }
     }
@@ -67,7 +62,7 @@ export default {
     showDialog(item) {
       this.dialogVisible = true
       this.is_add = !item.hasOwnProperty('id')
-      this.title = this.is_add ? '新增打印单' : '编辑打印单'
+      this.title = this.is_add ? '新增客户' : '编辑客户'
       for (const key in this.temp) {
         // if (item.hasOwnProperty(key)) {
 
@@ -77,7 +72,7 @@ export default {
     },
     onSubmit() {
       this.submit_loading = true
-      this.$req('/qyjz/materialSaveData', this.temp).then(({ code, msg, data }) => {
+      this.$req('/qyjz/customerSaveData', this.temp).then(({ code, msg, data }) => {
         this.$message({ message: msg, type: 'success' })
         this.submit_loading = false
         // this.dialogVisible = false
@@ -91,15 +86,6 @@ export default {
     handleClose() {
       console.log('handleClose')
       this.$emit('handleRefresh')
-    },
-    temp_list_obj(item) {
-      return {
-        id: item.id,
-        mid: item.mid || 0, // 材质id
-        name: item.name || '',
-        num: item.num || 1,
-        price: item.price || 0
-      }
     }
 
   }

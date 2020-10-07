@@ -5,9 +5,19 @@
   @close="handleClose"
   top="1vh" width="75%"
    >
-    <el-form ref="form" :model="temp" label-width="120px" size="mini">
+    <el-form ref="form" :model="temp" label-width="120px">
       <el-form-item prop="contacts" label="联系人">
-        <el-input v-model="temp.contacts" />
+         <el-autocomplete 
+          v-model="temp.contacts"  
+          class="inline-input"
+          :fetch-suggestions="handleCustomerQuerySearch"
+            @select="handleQueryStringCustomerSelect"
+            placeholder="请输入产品名"
+          >
+          <template slot-scope="{ item }">
+              <div class="name">{{ item.input_search_value }}</div>
+          </template>
+          </el-autocomplete>
       </el-form-item>
       <el-form-item prop="phone" label="联系电话">
         <el-input v-model="temp.phone" />
@@ -68,7 +78,8 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit" v-loading="submit_loading">保存</el-button>
-        <el-button type="warning" @click="onPrint" v-if="!is_add">打印</el-button>
+        <el-button type="warning" @click="onPrint" v-if="!is_add">打印</el-button>  
+        <el-alert title="修改内容后请点击保存后再选择打印!" type="warning" effect="dark" show-icon :closable="false" style="padding:4px 8px; margin-top:8px;"/>
       </el-form-item>
     </el-form>
 </el-dialog>
@@ -77,6 +88,7 @@
 
 <script>
 // import { ipcRenderer } from 'electron'
+import { myTimeToLocal } from '../../../utils/index.js'
 export default {
   props: {
     handlePrint: {
@@ -92,8 +104,10 @@ export default {
       title: '',
       dialogVisible: false,
       material: [],
+      customer: [],
       temp: {
         id: undefined,
+        customer_id: undefined, // 客户id
         contacts: undefined,
         phone: undefined,
         total_money: undefined,
@@ -129,6 +143,7 @@ export default {
     _initData() {
       this.$req('/qyjz/defInfo', { type: 'order' }).then(({ data }) => {
         this.material = data.material || []
+        this.customer = data.customer || []
       }).catch(v => {
 
       })
@@ -144,7 +159,15 @@ export default {
         this.temp[key] = item[key]
         // }
       }
-      this.temp.list = item.item_list || []
+      const list = item.item_list || []
+      const generate_list = []
+      list.map((product) => {
+        generate_list.push(this.temp_list_obj(product, { id: product.id, mid: product.cond_id }))
+      })
+      this.temp.list = generate_list
+      if (this.is_add) {
+        this.temp.group_date_time = myTimeToLocal()
+      }
     //   console.log(item, this.temp)
     },
     onSubmit() {
@@ -152,7 +175,11 @@ export default {
       this.$req('/qyjz/taskSave', this.temp).then(({ code, msg, data }) => {
         this.$message({ message: msg, type: 'success' })
         this.submit_loading = false
-        // this.dialogVisible = false
+        // 同步旧数据
+
+        // if (this.is_add) {
+        //   this.dialogVisible = false
+        // }
       }).catch(v => {
         this.submit_loading = false
       })
@@ -165,11 +192,12 @@ export default {
       console.log('handleClose')
       this.$emit('handleRefresh')
     },
-    temp_list_obj(item) {
+    temp_list_obj(item, options = {}) {
       return {
-        id: item.id,
-        mid: item.mid || 0, // 材质id
+        id: options.id,
+        mid: options.mid || 0, // 材质id
         name: item.name || '',
+        old_num: item.num || 0,
         num: item.num || 1,
         price: item.price || 0
       }
@@ -187,8 +215,17 @@ export default {
     handleMaterialQuerySearch(queryString, cb) {
       this._querySearch(queryString, cb, this.material || [])
     },
+    handleCustomerQuerySearch(queryString, cb) {
+      this._querySearch(queryString, cb, this.customer || [])
+    },
     handleQueryStringSelect(item, index) {
-      this.$set(this.temp.list, index, this.temp_list_obj({ mid: item.id, name: item.name, price: item.price }))
+      this.$set(this.temp.list, index, this.temp_list_obj({ name: item.name, price: item.price }, { mid: item.id }))
+    },
+    handleQueryStringCustomerSelect(item) {
+      console.log(item, '++++')
+      this.temp.customer_id = item.id
+      this.temp.contacts = item.name
+      this.temp.phone = item.tel
     },
     _querySearch(queryString, cb, restaurants = []) {
       var results = queryString ? restaurants.filter(this._createFilter(queryString)) : restaurants
